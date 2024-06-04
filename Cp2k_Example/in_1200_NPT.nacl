@@ -1,0 +1,153 @@
+&FORCE_EVAL
+  METHOD Fist
+  STRESS_TENSOR DIAGONAL_ANALYTICAL
+  &MM
+    &FORCEFIELD
+      &NONBONDED
+        &BMHFTD
+          atoms Cl Cl
+          A     275.10
+          B     3.3958
+          C     3.0742
+          D     1.7217
+          BD    3.2125
+          RCUT  12.00
+        &END BMHFTD
+        &BMHFTD
+          atoms Cl Na
+          A     67.5
+          B     3.2617
+          C     1.0408
+          D     1.1517
+          BD    3.2125
+          RCUT  12.00
+        &END BMHFTD
+        &BMHFTD
+          atoms Na Na
+          A     1.0000
+          B     9.4486
+          C     0.2569
+          D     0.3185
+          BD    3.2125
+          RCUT  12.00
+        &END BMHFTD
+      &END NONBONDED
+      &CHARGE
+        atom Cl
+        CHARGE  -1.000
+      &END CHARGE
+      &CHARGE
+        atom Na
+        CHARGE   1.000
+      &END CHARGE
+      &DIPOLE
+        atom     Cl
+        APOL     2.9637
+        &DAMPING
+          TYPE  Tang-Toennies
+          ATOM  Na
+          BIJ   3.3259
+          ORDER 4
+          CIJ   3.0000
+        &END DAMPING
+      &END DIPOLE
+      &DIPOLE
+        atom     Na
+        APOL     0.6990
+        &DAMPING
+          TYPE  Tang-Toennies
+          ATOM  Cl
+          BIJ   3.3259
+          ORDER 4
+          CIJ   0.697
+        &END DAMPING
+      &END DIPOLE
+    &END FORCEFIELD
+    &POISSON
+      &EWALD
+        EWALD_TYPE EWALD
+        RCUT 12.0
+        ALPHA 0.2917
+        GMAX 47
+        O_SPLINE 6
+        &MULTIPOLES T
+          MAX_MULTIPOLE_EXPANSION DIPOLE
+          POL_SCF CONJUGATE_GRADIENT
+          EPS_POL 1.0e-6
+          MAX_IPOL_ITER 100
+        &END MULTIPOLES
+      &END EWALD
+    &END POISSON
+    &PRINT
+      &ITER_INFO LOW
+      &END ITER_INFO
+    &END
+  &END MM
+  &SUBSYS
+    &CELL
+      ABC            34.00948494   34.00948494   34.00948494
+      PERIODIC       XYZ
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_NAME input_1200.xyz
+      COORDINATE XYZ
+      CONN_FILE_FORMAT OFF
+    &END TOPOLOGY
+  &END SUBSYS
+&END FORCE_EVAL
+&GLOBAL
+  PROJECT NaCl
+  RUN_TYPE MD
+&END GLOBAL
+&MOTION
+  &MD
+    COMVEL_TOL 1E-8
+    ENSEMBLE NPT_I
+    &BAROSTAT
+      PRESSURE 1.0
+      VIRIAL xyz
+    &END BAROSTAT
+    &THERMOSTAT
+      TYPE NOSE
+      REGION MASSIVE
+      &NOSE
+        LENGTH              3
+        YOSHIDA             3
+        TIMECON             100
+        MTS                 2
+      &END NOSE
+    &END THERMOSTAT
+    STEPS 500000
+    TIMESTEP 1.0
+    TEMPERATURE 1200
+    &PRINT
+      &ENERGY
+        &EACH
+          MD 10
+        &END EACH
+        FILENAME =md.ener
+      &END ENERGY
+    &END PRINT
+  &END MD
+  &PRINT
+    &TRAJECTORY
+      &EACH
+        MD 1000
+      &END EACH
+      FORMAT XYZ
+      FILENAME =md.xyz
+    &END TRAJECTORY
+    &CELL
+      &EACH 
+        MD 10
+      &END EACH
+      FILENAME =md.cell
+    &END CELL
+    &RESTART
+      &EACH
+        MD 1000000
+      &END EACH
+      FILENAME =md.restart
+    &END RESTART
+  &END PRINT
+&END MOTION
