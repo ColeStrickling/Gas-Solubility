@@ -1,0 +1,92 @@
+
+# Run_Name
+kcl_1100_test.out
+
+# Verbose_Log
+false
+
+# Sim_Type
+pregen
+
+# Cell_List_Overlap
+true
+
+# Nbr_Species
+3
+
+# VDW_Style
+BM cut 15
+
+# Charge_Style
+none
+
+# Mixing_Rule
+custom
+K_s1 Ar_s3 8.94021764 0.310930548 2.96570350 5506.71667 5218.28511
+Cl_s2 Ar_s3 8.70658991 0.335388238 3.03116729 3770.51645 1141.33750
+K_s1 Cl_s2 0.0 1.0 0.0 0.0 0.0
+
+# Seed_Info
+336671807 1146584549
+
+# Rcutoff_Low
+2.3
+
+# Molecule_Files
+k.mcf 864
+cl.mcf 864
+ar.mcf 1
+
+# Box_Info
+1
+cubic
+50
+
+# Temperature_Info
+1100.0
+
+# Pregen_Info
+1100_NVT.H 1100_NVT.xyz
+
+# Simulation_Length_Info
+units       steps
+prop_freq   100000
+coord_freq  10
+run         10000
+
+# Widom_Insertion
+true
+none
+none
+cbmc 30000 1 1000
+
+# CBMC_Info
+kappa_ins 100
+rcut_cbmc 7.0
+
+# Property_Info 1
+energy_total
+pressure
+volume
+mass_density
+enthalpy
+energy_intervdw
+energy_lrc
+energy_interq
+energy_recip
+energy_self
+energy_angle
+energy_dihedral
+energy_improper
+energy_intravdw
+energy_intraq
+energy_intra
+energy_inter
+
+# Fragment_Files
+species1/frag1/frag1.dat  1
+species2/frag1/frag1.dat  2
+species3/frag1/frag1.dat  3
+!---------------------------------------------------------one line per fragment
+
+END
