@@ -1,0 +1,12 @@
+#!/bin/bash
+#$ -r n
+#$ -q long
+#$ -N FS_RIM_1200
+#$ -M cstrick4@nd.edu
+#$ -m abe
+#$ -pe smp 4
+
+module load python
+module load mdanalysis
+
+python kcl_RIM_1200.py
