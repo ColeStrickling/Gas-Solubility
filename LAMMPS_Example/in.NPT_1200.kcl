@@ -1,7 +1,7 @@
-# LAMMPS input script for NaCl
+# LAMMPS input script for KCl
 variable        T equal 1200
 variable        relaxSteps equal 1000000
-variable        prodSteps equal 1000000
+variable        prodSteps equal 3000000
 variable        thermoSteps equal 100
 log             log.lammps_NPT_$T 
 
