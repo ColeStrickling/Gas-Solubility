@@ -1,0 +1,48 @@
+# Lammps input script
+variable	T equal 1200
+log 		log.lammps_NVT_$T
+variable 	relaxSteps equal 1000000
+variable 	prodSteps equal 3000000
+variable 	thermoSteps equal 1000000
+
+units 		real
+atom_style 	full
+dimension 	3
+boundary 	p p p 
+
+pair_style 	born/coul/long 15.0
+pair_modify 	tail yes
+kspace_style	ewald 1.0e-5
+
+read_data 	NPT_1200.data 
+
+pair_coeff      1 1 6.081153134 0.337 2.926 349.759 -345.438 
+pair_coeff      1 2 4.864922507 0.337 3.048 690.877 -1050.708  
+pair_coeff      2 2 3.648691880 0.337 3.170 1791.961 -3598.315 
+
+neighbor 	3.0 bin
+neigh_modify 	every 2 delay 0 check yes one 3000
+
+group 		K type 1
+group 		Cl type 2
+group 		all union K Cl
+
+timestep 	1.0
+thermo 		${thermoSteps}
+thermo_style 	custom step cpu cpuremain temp pe density
+
+minimize 	1.0e-4 1.0e-6 100 1000
+
+fix 		1 all nvt temp $T $T 1000
+fix 		stable all momentum 10000 linear 1 1 1 angular
+
+run 		${relaxSteps}
+
+unfix 		1
+
+fix 		1 all nvt temp $T $T 1000
+
+dump            1 all custom 1000 $T_NVT.lammpstrj id type xu yu zu mol diameter
+ 
+run 		${prodSteps}
+write_data 	NVT_$T.data

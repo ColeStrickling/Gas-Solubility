@@ -1,0 +1,56 @@
+# LAMMPS input script for NaCl
+variable        T equal 1200
+variable        relaxSteps equal 1000000
+variable        prodSteps equal 1000000
+variable        thermoSteps equal 100
+log             log.lammps_NPT_$T 
+
+units           real
+atom_style      full
+dimension       3
+boundary        p p p
+
+pair_style      born/coul/long 15.0
+pair_modify     tail yes
+kspace_style    ewald 1.0e-5
+
+read_data       NPT_1500.data
+
+pair_coeff      1 1 6.081153134 0.337 2.926 349.759 -345.438
+pair_coeff      1 2 4.864922507 0.337 3.048 690.877 -1050.708
+pair_coeff      2 2 3.648691880 0.337 3.170 1791.961 -3598.315
+
+neighbor        3.0 bin
+neigh_modify    every 1 delay 0 check yes page 1000000 one 20000 
+
+group           K type 1
+group           Cl type 2
+group           all union K Cl
+region          box block INF INF INF INF INF INF
+
+timestep        1.0
+thermo          ${thermoSteps}
+thermo_style    custom step temp density vol lx ly lz press ke pe etotal etail enthalpy
+
+minimize 1.0e-4 1.0e-6 100 1000
+#dump            1 all custom 1 $T.lammpstraj id type xu yu zu
+#dump_modify     1 sort id
+
+fix             1 all nvt temp 1500 1500 1000.0
+fix             stable all momentum 10000 linear 1 1 1 angular
+run             ${relaxSteps}
+unfix           1
+
+reset_timestep  0
+fix             1 all npt temp 1500 $T 1000.0 iso 1.0 1.0 10000.0
+dump            1 all custom 1000 $T_NPT.lammpstrj id type x y z xu yu zu
+dump_modify     1 sort id
+run             ${prodSteps}
+unfix 		1
+
+reset_timestep  0
+fix             2 all npt temp $T $T 1000.0 iso 1.0 1.0 10000.0
+dump            2 all custom 1000 $T_NPT.lammpstrj id type x y z xu yu zu
+dump_modify     2 sort id
+run             ${prodSteps}
+write_data      NPT_$T.data
